@@ -1,55 +1,17 @@
 pipeline {
     agent any
 
-    environment {
-        DEPLOY_DIR = "/var/www/html"
-        REPO_URL = "https://github.com/mounikamandragutti/Car-website.git"
-        BRANCH = "main"
-    }
-
     stages {
-
-        stage('Clean Workspace') {
+        stage('Clone Code') {
             steps {
-                cleanWs()
+                git 'https://github.com/harikamekala222/Car-Application.git'
             }
         }
 
-        stage('Checkout Code') {
+        stage('Deploy Website') {
             steps {
-                git branch: "${BRANCH}", url: "${REPO_URL}"
+                sh 'cp -r * /var/www/html/'
             }
-        }
-
-        stage('Verify Files') {
-            steps {
-                sh 'ls -la'
-            }
-        }
-
-        stage('Deploy to Apache') {
-            steps {
-                sh '''
-                echo "Deploying website to Apache directory..."
-                sudo rm -rf ${DEPLOY_DIR}/*
-                sudo cp -r * ${DEPLOY_DIR}/
-                '''
-            }
-        }
-
-        stage('Restart Apache') {
-            steps {
-                sh 'sudo systemctl restart httpd'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "Deployment Successful!"
-        }
-        failure {
-            echo "Deployment Failed!"
         }
     }
 }
